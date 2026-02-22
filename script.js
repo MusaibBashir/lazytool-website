@@ -36,12 +36,12 @@ const CONTENT = {
       <h1>Download</h1>
       <div class="subtitle">v2.0.0 Now Available</div>
       <div class="download-boxes">
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.0.0/LazyTool-macOS.dmg" download class="download-box">
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.0.1/LazyTool-macOS.dmg" download class="download-box">
           <i class="fab fa-apple"></i>
           <span class="os-name">macOS</span>
           <small>.dmg installer</small>
         </a>
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.0.0/LazyTool-win.exe" download class="download-box">
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.0.1/LazyTool-win.exe" download class="download-box">
           <i class="fab fa-windows"></i>
           <span class="os-name">Windows</span>
           <small>.exe setup</small>
@@ -54,17 +54,18 @@ const CONTENT = {
   `,
   HowToUse: `
     <div class="tv-content active">
-      <h1>Shortcuts</h1>
-      <div class="subtitle">Master the home row.</div>
-      <ul class="use-list">
-        <li><span>1-6</span> Switch between panels</li>
-        <li><span>a / d</span> Add or Delete items</li>
-        <li><span>space</span> Toggle / Check-off</li>
-        <li><span>h / l</span> Prev / Next day</li>
-        <li><span>?</span> Show help menu</li>
-      </ul>
+      <h1>Screenshots</h1>
+      <div class="subtitle">App preview — swipe or use controls.</div>
+      <div class="slideshow">
+        <div class="slideshow-stage">
+          <button class="slide-btn prev" id="prevSlide" aria-label="Previous">◀</button>
+          <img id="slideshowImg" src="" alt="screenshot" />
+          <button class="slide-btn next" id="nextSlide" aria-label="Next">▶</button>
+        </div>
+        <div class="dots" id="slideDots" aria-hidden="false"></div>
+      </div>
       <div class="button-group">
-        <button class="btn-retro" onclick="switchTo(0)">Got it</button>
+        <button class="btn-retro" onclick="switchTo(0)">Back</button>
       </div>
     </div>
   `,
@@ -80,6 +81,65 @@ const CONTENT = {
     </div>
   `
 };
+
+// Slideshow images (Cloudinary links). Replace with your actual URLs.
+const SCREENSHOTS = [
+  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-21_212646_arpf2k.png',
+  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-22_202526_feeqkc.png',
+  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772179/Screenshot_2026-02-22_202547_avlxqg.png',
+  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-21_212646_arpf2k.png',
+  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-22_202531_sffhh9.png'
+];
+
+// Slideshow state
+let slideIndex = 0;
+let slideTimer = null;
+
+function renderSlide() {
+  const img = document.getElementById('slideshowImg');
+  const dots = document.getElementById('slideDots');
+  if (!img || !dots) return;
+  img.src = SCREENSHOTS[slideIndex] || '';
+  Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === slideIndex));
+}
+
+function nextSlide() {
+  slideIndex = (slideIndex + 1) % SCREENSHOTS.length;
+  renderSlide();
+}
+
+function prevSlide() {
+  slideIndex = (slideIndex - 1 + SCREENSHOTS.length) % SCREENSHOTS.length;
+  renderSlide();
+}
+
+function startSlideshow() {
+  stopSlideshow();
+  slideIndex = 0;
+  const dots = document.getElementById('slideDots');
+  if (!dots) return;
+  dots.innerHTML = '';
+  SCREENSHOTS.forEach((s, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => { slideIndex = i; renderSlide(); });
+    dots.appendChild(d);
+  });
+  const nextBtn = document.getElementById('nextSlide');
+  const prevBtn = document.getElementById('prevSlide');
+  if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+  if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+  renderSlide();
+  slideTimer = setInterval(nextSlide, 3000);
+}
+
+function stopSlideshow() {
+  if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
+  const nextBtn = document.getElementById('nextSlide');
+  const prevBtn = document.getElementById('prevSlide');
+  if (nextBtn) nextBtn.removeEventListener('click', nextSlide);
+  if (prevBtn) prevBtn.removeEventListener('click', prevSlide);
+}
 
 // ── CANVAS SETUP ─────────────────────────────────────────────────
 const tvScreen = document.getElementById('tvScreen');
@@ -126,6 +186,12 @@ function updateButtons(idx) {
 function updateOverlay(idx) {
   const page = CHANNELS[idx].name;
   overlay.innerHTML = CONTENT[page];
+  // initialize slideshow when the injected content contains the slideshow image
+  if (document.getElementById('slideshowImg')) {
+    setTimeout(startSlideshow, 80);
+  } else {
+    stopSlideshow();
+  }
 }
 
 // ── PHOSPHOR GLOW ─────────────────────────────────────────────────
