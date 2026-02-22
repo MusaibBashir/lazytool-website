@@ -16,6 +16,12 @@
   <div class="tv-wrap">
     <div class="tv-cabinet">
       <div class="tv-bezel">
+        <div class="bezel-top-bar">
+          <div class="indicator-row">
+            <div class="led"></div>
+            <span class="on-air-label">ON AIR</span>
+          </div>
+        </div>
         <div class="tv-screen" id="tvScreen" tabindex="0">
           <div id="contentOverlay" class="tv-content-layer"></div>
           <canvas id="screen"></canvas>
@@ -27,21 +33,55 @@
 
       <div class="tv-controls">
         <div class="tv-brand">LazyTool</div>
-        <div class="indicator-row">
-          <div class="led"></div>
-          <span
-            style="font-family:'VT323',monospace;font-size:14px;color:rgba(200,191,173,0.3);letter-spacing:0.1em;">ON
-            AIR</span>
-        </div>
+        <div class="channel-buttons" id="channelStrip"></div>
         <div class="knobs">
-          <div class="knob" id="prevKnob" title="Previous channel"></div>
+          <div class="knob vol-knob" id="volKnob" title="Drag to adjust volume">
+            <svg class="speaker-engrave" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="3,7 3,13 7,13 11,16 11,4 7,7"/>
+              <path d="M13,7.5 Q15,10 13,12.5" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M15,5.5 Q18.5,10 15,14.5" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <div class="knob-tick" id="volTick"></div>
+          </div>
+          <div class="knob bri-knob" id="briKnob" title="Drag to adjust brightness">
+            <!-- Sun engraving -->
+            <svg class="bri-engrave" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="3.2"/>
+              <line x1="10" y1="1.5" x2="10" y2="4"   stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="10" y1="16" x2="10" y2="18.5" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="1.5" y1="10" x2="4"  y2="10"  stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="16" y1="10" x2="18.5" y2="10" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="3.8" y1="3.8" x2="5.6" y2="5.6" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="14.4" y1="14.4" x2="16.2" y2="16.2" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="16.2" y1="3.8" x2="14.4" y2="5.6" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="5.6" y1="14.4" x2="3.8" y2="16.2" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <div class="knob-tick" id="briTick"></div>
+          </div>
           <div class="knob ch-knob" id="nextKnob" title="Next channel"></div>
+        </div>
+      </div>
+      <div class="cabinet-engraving">&#169; Musaib Bin Bashir</div>
+
+      <div class="feedback-row">
+        <div class="vol-feedback" id="volFeedback">
+          <svg class="vol-arc-svg" viewBox="0 0 70 70">
+            <path id="volArcBg" fill="none" stroke="rgba(200,191,173,0.1)" stroke-width="4" stroke-linecap="round"/>
+            <path id="volArcFill" fill="none" stroke="#c4893a" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <span class="vol-pct" id="volPct">60</span>
+        </div>
+        <div class="vol-feedback" id="briFeedback">
+          <svg class="vol-arc-svg" viewBox="0 0 70 70">
+            <path id="briArcBg" fill="none" stroke="rgba(200,191,173,0.1)" stroke-width="4" stroke-linecap="round"/>
+            <path id="briArcFill" fill="none" stroke="#e8dfc0" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <span class="vol-pct" id="briPct" style="color:#e8dfc0;text-shadow:0 0 8px rgba(232,223,192,0.7);">80</span>
         </div>
       </div>
     </div>
 
-    <div class="channel-strip" id="channelStrip"></div>
-    <div class="hint">click knob or channel buttons to switch · space / arrow keys work too</div>
+    <div class="hint">drag vol/bri knobs · click channel buttons or ch knob · space / arrow keys</div>
 
   </div>
   <script src="./script.js"></script>

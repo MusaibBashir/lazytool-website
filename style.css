@@ -331,6 +331,7 @@ body::before {
   justify-content: space-between;
   margin-top: 20px;
   padding: 0 4px;
+  gap: 16px;
 }
 
 .tv-brand {
@@ -391,6 +392,152 @@ body::before {
   top: 5px;
 }
 
+/* ── VOLUME KNOB ───────────────────────────────────── */
+.vol-knob {
+  width: 32px;
+  height: 32px;
+  cursor: grab;
+  user-select: none;
+  /* no ::after tick for vol knob — we use .knob-tick instead */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vol-knob::after { display: none; }
+
+.vol-knob:active { cursor: grabbing; }
+
+.speaker-engrave {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  color: rgba(200, 191, 173, 0.22);
+  fill: rgba(200, 191, 173, 0.22);
+  stroke: rgba(200, 191, 173, 0.22);
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.7));
+  z-index: 1;
+}
+
+/* Rotating tick line on vol knob */
+.knob-tick {
+  position: absolute;
+  width: 3px;
+  height: 9px;
+  background: rgba(200, 191, 173, 0.6);
+  border-radius: 2px;
+  top: 3px;
+  left: 50%;
+  transform-origin: 50% calc(100% + 7px);
+  transform: translateX(-50%) rotate(0deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Volume arc + label feedback */
+.vol-feedback {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.vol-feedback.visible { opacity: 1; }
+
+/* Feedback row sits under the controls bar */
+.feedback-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* target both feedback elements as siblings — show inline */
+#volFeedback, #briFeedback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  vertical-align: top;
+}
+#volFeedback.visible, #briFeedback.visible { opacity: 1; }
+
+.vol-arc-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vol-pct {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: #c4893a;
+  text-shadow: 0 0 8px rgba(196, 137, 58, 0.6);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ── CABINET ENGRAVING ────────────────────────────── */
+.cabinet-engraving {
+  text-align: center;
+  margin-top: 14px;
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: transparent;
+  /* Chiselled-into-wood effect: dark shadow below, faint light above */
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 -1px 0 rgba(0, 0, 0, 0.8);
+  background: linear-gradient(to bottom, #2a1e12, #3a2a1c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  user-select: none;
+  pointer-events: none;
+}
+.bri-knob {
+  width: 32px;
+  height: 32px;
+  cursor: grab;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bri-knob::after { display: none; }
+.bri-knob:active { cursor: grabbing; }
+
+.bri-engrave {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  color: rgba(200, 191, 173, 0.22);
+  fill: rgba(200, 191, 173, 0.22);
+  stroke: rgba(200, 191, 173, 0.22);
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.7));
+  z-index: 1;
+}
+
+/* Brightness applied as filter on the screen bezel */
+.tv-bezel {
+  transition: filter 0.1s ease;
+}
+
 .indicator-row {
   display: flex;
   gap: 6px;
@@ -418,44 +565,138 @@ body::before {
   }
 }
 
-/* ── CHANNEL STRIP ────────────────────────────────── */
-.channel-strip {
+/* ── BEZEL TOP BAR ────────────────────────────────── */
+.bezel-top-bar {
   display: flex;
-  gap: 8px;
-  margin-top: 22px;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 590px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 4px 10px 4px;
+}
+
+.on-air-label {
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: rgba(200, 191, 173, 0.3);
+  letter-spacing: 0.12em;
+}
+
+/* ── PHYSICAL CHANNEL BUTTONS ─────────────────────── */
+.channel-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .ch-btn {
-  width: 44px;
-  height: 30px;
-  border: 1px solid rgba(200, 191, 173, 0.15);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
-  color: rgba(200, 191, 173, 0.5);
-  font-family: 'VT323', monospace;
-  font-size: 16px;
+  position: relative;
+  width: 38px;
+  height: 42px;
+  border-radius: 6px 6px 4px 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+
+  /* Physical button body */
+  background: linear-gradient(160deg, #3d2f20 0%, #2a1e12 60%, #1e160c 100%);
+  border: none;
+
+  /* Top highlight + deep bottom shadow = 3D depth */
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.10) inset,
+    0 -1px 0 rgba(0,0,0,0.5) inset,
+    1px 0 0 rgba(255,255,255,0.05) inset,
+    -1px 0 0 rgba(0,0,0,0.3) inset,
+    0 5px 0 #0f0a05,
+    0 6px 2px rgba(0,0,0,0.7),
+    0 8px 8px rgba(0,0,0,0.4);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+/* Raised face plate */
+.ch-btn::before {
+  content: '';
+  position: absolute;
+  inset: 3px 3px 8px 3px;
+  border-radius: 3px;
+  background: linear-gradient(170deg, #4a3828 0%, #2e2018 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.07) inset,
+    0 -1px 0 rgba(0,0,0,0.4) inset;
+}
+
+.ch-btn-num {
+  position: relative;
+  z-index: 2;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  line-height: 1;
+  color: rgba(200, 191, 173, 0.45);
+  transition: color 0.2s, text-shadow 0.2s;
+  pointer-events: none;
+}
+
+/* Small LED dot on each button */
+.ch-btn-dot {
+  position: relative;
+  z-index: 2;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(200, 191, 173, 0.15);
+  box-shadow: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  pointer-events: none;
 }
 
 .ch-btn:hover {
-  border-color: rgba(200, 191, 173, 0.4);
-  color: rgba(232, 226, 217, 0.9);
-  transform: translateY(-1px);
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.10) inset,
+    0 -1px 0 rgba(0,0,0,0.5) inset,
+    1px 0 0 rgba(255,255,255,0.05) inset,
+    -1px 0 0 rgba(0,0,0,0.3) inset,
+    0 3px 0 #0f0a05,
+    0 4px 2px rgba(0,0,0,0.7),
+    0 5px 5px rgba(0,0,0,0.3);
+}
+
+.ch-btn:active {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.3) inset,
+    0 -1px 0 rgba(255,255,255,0.05) inset,
+    0 1px 0 #0f0a05,
+    0 2px 2px rgba(0,0,0,0.5);
 }
 
 .ch-btn.active {
-  border-color: var(--ch-color, #c4893a);
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.3) inset,
+    0 -1px 0 rgba(255,255,255,0.05) inset,
+    0 2px 0 #0f0a05,
+    0 3px 6px rgba(0,0,0,0.5),
+    0 0 14px var(--ch-color, #c4893a);
+}
+
+.ch-btn.active .ch-btn-num {
   color: #e8e2d9;
-  box-shadow: 0 0 10px var(--ch-color, #c4893a), inset 0 0 8px rgba(255, 255, 255, 0.05);
+  text-shadow: 0 0 8px var(--ch-color, #c4893a);
+}
+
+.ch-btn.active .ch-btn-dot {
+  background: var(--ch-color, #c4893a);
+  box-shadow: 0 0 6px var(--ch-color, #c4893a), 0 0 12px var(--ch-color, #c4893a);
 }
 
 /* ── HINT ─────────────────────────────────────────── */
 .hint {
-  margin-top: 16px;
+  margin-top: 12px;
   font-size: 10px;
   letter-spacing: 0.22em;
   text-transform: uppercase;

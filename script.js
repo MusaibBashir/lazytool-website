@@ -171,9 +171,19 @@ const strip = document.getElementById('channelStrip');
 CHANNELS.forEach((ch, i) => {
   const btn = document.createElement('button');
   btn.className = 'ch-btn' + (i === 0 ? ' active' : '');
-  btn.textContent = String(ch.ch).padStart(2, '0');
   btn.style.setProperty('--ch-color', ch.hex);
+  btn.title = ch.name;
   btn.addEventListener('click', () => switchTo(i));
+
+  const num = document.createElement('span');
+  num.className = 'ch-btn-num';
+  num.textContent = String(ch.ch);
+
+  const dot = document.createElement('span');
+  dot.className = 'ch-btn-dot';
+
+  btn.appendChild(num);
+  btn.appendChild(dot);
   strip.appendChild(btn);
 });
 
@@ -273,6 +283,9 @@ function switchTo(idx) {
   updateButtons(currentCh);
   setGlow(CHANNELS[currentCh]);
 
+  // TV static crackle sound on switch
+  playStaticBurst();
+
   tvScreen.classList.add('switching');
   setTimeout(() => {
     updateOverlay(currentCh);
@@ -289,7 +302,6 @@ function prev() { switchTo(currentCh - 1); }
 
 // ── INPUT ─────────────────────────────────────────────────────────
 document.getElementById('nextKnob').addEventListener('click', next);
-document.getElementById('prevKnob').addEventListener('click', prev);
 
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); next(); }
@@ -309,3 +321,354 @@ function loop() {
 }
 
 loop();
+
+// ── AUDIO ENGINE ──────────────────────────────────────────────────
+let audioCtx = null;
+let masterGain = null;
+let audioStarted = false;
+
+// ── CALMING AMBIENT PAD ───────────────────────────────────────────
+// Built from sine waves tuned to a warm Cmaj7 → Fmaj9 floating chord
+// with slow chorus detuning and reverb via convolver impulse
+
+function buildAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = volume;
+  masterGain.connect(audioCtx.destination);
+
+  // ── Reverb (synthetic impulse response) ──────────────────────────
+  const reverbLen = audioCtx.sampleRate * 3.5;
+  const impulse = audioCtx.createBuffer(2, reverbLen, audioCtx.sampleRate);
+  for (let c = 0; c < 2; c++) {
+    const ch = impulse.getChannelData(c);
+    for (let i = 0; i < reverbLen; i++) {
+      ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.2);
+    }
+  }
+  const convolver = audioCtx.createConvolver();
+  convolver.buffer = impulse;
+
+  const reverbGain = audioCtx.createGain();
+  reverbGain.gain.value = 0.45;
+  convolver.connect(reverbGain);
+  reverbGain.connect(masterGain);
+
+  // ── Pad voices — Cmaj7 spread across octaves ─────────────────────
+  // C2, G2, E3, B3, G4, D5  → lush, open, non-dissonant
+  const notes = [65.41, 98, 164.81, 246.94, 392, 587.33];
+  const detunes = [0, 3, -4, 5, -2, 6];
+  const gains   = [0.22, 0.18, 0.16, 0.12, 0.09, 0.06];
+
+  notes.forEach((freq, i) => {
+    // Main voice
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    osc.detune.value = detunes[i];
+
+    // Subtle chorus twin slightly detuned
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.value = freq;
+    osc2.detune.value = detunes[i] - 8;
+
+    const g = audioCtx.createGain();
+    g.gain.value = gains[i];
+
+    osc.connect(g);
+    osc2.connect(g);
+    g.connect(masterGain);
+    g.connect(convolver); // send to reverb too
+
+    osc.start();
+    osc2.start();
+  });
+
+  // ── Very slow volume breathing LFO (7s cycle) ────────────────────
+  const lfo = audioCtx.createOscillator();
+  const lfoAmt = audioCtx.createGain();
+  lfo.frequency.value = 1 / 7;
+  lfoAmt.gain.value = 0.04;
+  lfo.connect(lfoAmt);
+  lfoAmt.connect(masterGain.gain);
+  lfo.start();
+
+  // ── Gentle high-frequency shimmer (triangle at 5th harmonic) ─────
+  const shimmer = audioCtx.createOscillator();
+  const shimGain = audioCtx.createGain();
+  shimmer.type = 'triangle';
+  shimmer.frequency.value = 1318.5; // E6
+  shimGain.gain.value = 0.018;
+  shimmer.connect(shimGain);
+  shimGain.connect(convolver);
+  shimmer.start();
+
+  audioStarted = true;
+}
+
+// ── TV STATIC BURST on channel switch ────────────────────────────
+function playStaticBurst() {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const dur = 1.1; // longer burst
+
+  // ── Layer 1: main white noise body ──────────────────────────────
+  const bufLen = Math.floor(audioCtx.sampleRate * dur);
+  const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+
+  // Bandpass centred at TV static crackle range
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 1800;
+  bp.Q.value = 0.5;
+
+  // Envelope: snap in, hold dirty, then fade
+  const env = audioCtx.createGain();
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(volume * 1.0, t + 0.015);
+  env.gain.setValueAtTime(volume * 0.85, t + 0.12);
+  env.gain.linearRampToValueAtTime(volume * 0.6, t + 0.45);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+  src.connect(bp); bp.connect(env); env.connect(audioCtx.destination);
+  src.start(t); src.stop(t + dur + 0.05);
+
+  // ── Layer 2: high-freq scratch (3–6kHz) — the "fingernail" ──────
+  const scratchBuf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+  const sd = scratchBuf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) {
+    // Clipped noise for harsher texture
+    sd[i] = Math.max(-0.6, Math.min(0.6, (Math.random() * 2 - 1) * 2.5));
+  }
+  const src2 = audioCtx.createBufferSource();
+  src2.buffer = scratchBuf;
+
+  const hp = audioCtx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 3200;
+  hp.Q.value = 1.2;
+
+  const env2 = audioCtx.createGain();
+  env2.gain.setValueAtTime(0, t);
+  env2.gain.linearRampToValueAtTime(volume * 0.55, t + 0.02);
+  env2.gain.setValueAtTime(volume * 0.4, t + 0.15);
+  env2.gain.exponentialRampToValueAtTime(volume * 0.15, t + 0.6);
+  env2.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+  src2.connect(hp); hp.connect(env2); env2.connect(audioCtx.destination);
+  src2.start(t); src2.stop(t + dur + 0.05);
+
+  // ── Layer 3: low thump on the cut-in (like a CRT deflection) ────
+  const thumpOsc = audioCtx.createOscillator();
+  thumpOsc.type = 'sine';
+  thumpOsc.frequency.setValueAtTime(120, t);
+  thumpOsc.frequency.exponentialRampToValueAtTime(35, t + 0.18);
+
+  const thumpEnv = audioCtx.createGain();
+  thumpEnv.gain.setValueAtTime(volume * 0.5, t);
+  thumpEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+
+  thumpOsc.connect(thumpEnv); thumpEnv.connect(audioCtx.destination);
+  thumpOsc.start(t); thumpOsc.stop(t + 0.22);
+
+  // ── Layer 4: intermittent crackle pops scattered through the burst
+  const popCount = 6;
+  for (let p = 0; p < popCount; p++) {
+    const popT = t + 0.06 + (p / popCount) * (dur - 0.15) + (Math.random() * 0.08);
+    const popBuf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * 0.03), audioCtx.sampleRate);
+    const pd = popBuf.getChannelData(0);
+    for (let i = 0; i < pd.length; i++) pd[i] = Math.random() * 2 - 1;
+
+    const popSrc = audioCtx.createBufferSource();
+    popSrc.buffer = popBuf;
+
+    const popBP = audioCtx.createBiquadFilter();
+    popBP.type = 'peaking';
+    popBP.frequency.value = 1000 + Math.random() * 3000;
+    popBP.gain.value = 12;
+
+    const popEnv = audioCtx.createGain();
+    popEnv.gain.setValueAtTime(volume * (0.4 + Math.random() * 0.4), popT);
+    popEnv.gain.exponentialRampToValueAtTime(0.0001, popT + 0.03);
+
+    popSrc.connect(popBP); popBP.connect(popEnv); popEnv.connect(audioCtx.destination);
+    popSrc.start(popT); popSrc.stop(popT + 0.04);
+  }
+}
+
+// ── VOLUME KNOB DRAG ──────────────────────────────────────────────
+const volKnob = document.getElementById('volKnob');
+const volTick = document.getElementById('volTick');
+const volFeedback = document.getElementById('volFeedback');
+const volPct = document.getElementById('volPct');
+const volArcBg = document.getElementById('volArcBg');
+const volArcFill = document.getElementById('volArcFill');
+
+// Volume in [0,1], starting at 60%
+let volume = 0.6;
+// Knob rotation: map [0,1] → [-135°, +135°]
+const MIN_DEG = -135;
+const MAX_DEG = 135;
+
+let knobDragging = false;
+let knobStartY = 0;
+let knobStartVol = 0;
+let hideTimer = null;
+
+function volToDeg(v) { return MIN_DEG + v * (MAX_DEG - MIN_DEG); }
+
+function describeArc(cx, cy, r, startDeg, endDeg) {
+  function polar(deg) {
+    const rad = (deg - 90) * Math.PI / 180;
+    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+  }
+  const [sx, sy] = polar(startDeg);
+  const [ex, ey] = polar(endDeg);
+  const large = endDeg - startDeg > 180 ? 1 : 0;
+  return `M ${sx} ${sy} A ${r} ${r} 0 ${large} 1 ${ex} ${ey}`;
+}
+
+function updateVolUI() {
+  const deg = volToDeg(volume);
+  volTick.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+
+  // Arc svg (cx=35, cy=35, r=28)
+  const bgPath = describeArc(35, 35, 28, MIN_DEG + 90, MAX_DEG + 90);
+  const fillEnd = MIN_DEG + volume * (MAX_DEG - MIN_DEG);
+  const fillPath = volume > 0.005 ? describeArc(35, 35, 28, MIN_DEG + 90, fillEnd + 90) : '';
+  volArcBg.setAttribute('d', bgPath);
+  volArcFill.setAttribute('d', fillPath);
+
+  volPct.textContent = Math.round(volume * 100);
+
+  if (masterGain) masterGain.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.05);
+}
+
+function showVolFeedback() {
+  volFeedback.classList.add('visible');
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => volFeedback.classList.remove('visible'), 1200);
+}
+
+volKnob.addEventListener('mousedown', e => {
+  // Start audio on first interaction
+  if (!audioStarted) buildAudio();
+  knobDragging = true;
+  knobStartY = e.clientY;
+  knobStartVol = volume;
+  e.preventDefault();
+});
+
+volKnob.addEventListener('touchstart', e => {
+  if (!audioStarted) buildAudio();
+  knobDragging = true;
+  knobStartY = e.touches[0].clientY;
+  knobStartVol = volume;
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('mousemove', e => {
+  if (!knobDragging) return;
+  const dy = knobStartY - e.clientY; // drag up = louder
+  volume = Math.max(0, Math.min(1, knobStartVol + dy / 120));
+  updateVolUI();
+  showVolFeedback();
+});
+
+document.addEventListener('touchmove', e => {
+  if (!knobDragging) return;
+  const dy = knobStartY - e.touches[0].clientY;
+  volume = Math.max(0, Math.min(1, knobStartVol + dy / 120));
+  updateVolUI();
+  showVolFeedback();
+}, { passive: false });
+
+document.addEventListener('mouseup', () => { knobDragging = false; });
+document.addEventListener('touchend', () => { knobDragging = false; });
+
+// Also start audio on any click on screen (browser autoplay policy)
+document.addEventListener('click', () => { if (!audioStarted) buildAudio(); }, { once: true });
+
+// Init tick position
+updateVolUI();
+
+// ── BRIGHTNESS KNOB ───────────────────────────────────────────────
+const briKnob = document.getElementById('briKnob');
+const briTick = document.getElementById('briTick');
+const briFeedback = document.getElementById('briFeedback');
+const briPct = document.getElementById('briPct');
+const briArcBg = document.getElementById('briArcBg');
+const briArcFill = document.getElementById('briArcFill');
+const tvBezel = document.querySelector('.tv-bezel');
+
+let brightness = 0.8; // 0 → 1, starting at 80%
+let briDragging = false;
+let briStartY = 0;
+let briStartVal = 0;
+let briHideTimer = null;
+
+function updateBriUI() {
+  const deg = MIN_DEG + brightness * (MAX_DEG - MIN_DEG);
+  briTick.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+
+  const bgPath = describeArc(35, 35, 28, MIN_DEG + 90, MAX_DEG + 90);
+  const fillEnd = MIN_DEG + brightness * (MAX_DEG - MIN_DEG);
+  const fillPath = brightness > 0.005 ? describeArc(35, 35, 28, MIN_DEG + 90, fillEnd + 90) : '';
+  briArcBg.setAttribute('d', bgPath);
+  briArcFill.setAttribute('d', fillPath);
+
+  briPct.textContent = Math.round(brightness * 100);
+
+  // Map 0–1 → brightness(0.05) to brightness(1.6) for a dramatic range
+  const bri = 0.05 + brightness * 1.55;
+  tvBezel.style.filter = `brightness(${bri})`;
+}
+
+function showBriFeedback() {
+  briFeedback.classList.add('visible');
+  clearTimeout(briHideTimer);
+  briHideTimer = setTimeout(() => briFeedback.classList.remove('visible'), 1200);
+}
+
+briKnob.addEventListener('mousedown', e => {
+  briDragging = true;
+  briStartY = e.clientY;
+  briStartVal = brightness;
+  e.preventDefault();
+});
+
+briKnob.addEventListener('touchstart', e => {
+  briDragging = true;
+  briStartY = e.touches[0].clientY;
+  briStartVal = brightness;
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('mousemove', e => {
+  if (!briDragging) return;
+  const dy = briStartY - e.clientY;
+  brightness = Math.max(0, Math.min(1, briStartVal + dy / 120));
+  updateBriUI();
+  showBriFeedback();
+});
+
+document.addEventListener('touchmove', e => {
+  if (!briDragging) return;
+  const dy = briStartY - e.touches[0].clientY;
+  brightness = Math.max(0, Math.min(1, briStartVal + dy / 120));
+  updateBriUI();
+  showBriFeedback();
+}, { passive: false });
+
+document.addEventListener('mouseup', () => { briDragging = false; });
+document.addEventListener('touchend', () => { briDragging = false; });
+
+updateBriUI();
