@@ -34,14 +34,14 @@ const CONTENT = {
   Download: `
     <div class="tv-content active">
       <h1>Download</h1>
-      <div class="subtitle">v2.0.0 Now Available</div>
+      <div class="subtitle">v2.1.0 Now Available</div>
       <div class="download-boxes">
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.0.1/LazyTool-macOS.dmg" download class="download-box">
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.0/LazyTool-macOS.dmg" download class="download-box">
           <i class="fab fa-apple"></i>
           <span class="os-name">macOS</span>
           <small>.dmg installer</small>
         </a>
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.0.1/LazyTool-win.exe" download class="download-box">
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.0/LazyTool-win.exe" download class="download-box">
           <i class="fab fa-windows"></i>
           <span class="os-name">Windows</span>
           <small>.exe setup</small>
