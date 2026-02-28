@@ -1,10 +1,10 @@
-// ── PALETTE / CHANNELS ───────────────────────────────────────────
 const CHANNELS = [
   { ch: 1, name: 'Home', hex: '#1a1814', r: 26, g: 24, b: 20, desc: 'LazyTool - Be less lazy' },
   { ch: 2, name: 'About', hex: '#2e3d4f', r: 46, g: 61, b: 79, desc: 'What is LazyTool?' },
-  { ch: 3, name: 'Download', hex: '#4a5e45', r: 74, g: 94, b: 69, desc: 'Get the tool' },
-  { ch: 4, name: 'HowToUse', hex: '#9c7c5e', r: 156, g: 124, b: 94, desc: 'Keyboard guide' },
-  { ch: 5, name: 'AboutMe', hex: '#c4893a', r: 196, g: 137, b: 58, desc: 'Meet the dev' },
+  { ch: 3, name: 'Features', hex: '#3d2e4f', r: 61, g: 46, b: 79, desc: 'All features' },
+  { ch: 4, name: 'Download', hex: '#4a5e45', r: 74, g: 94, b: 69, desc: 'Get the tool' },
+  { ch: 5, name: 'Screenshots', hex: '#9c7c5e', r: 156, g: 124, b: 94, desc: 'Screenshots' },
+  { ch: 6, name: 'AboutMe', hex: '#c4893a', r: 196, g: 137, b: 58, desc: 'Meet the dev' },
 ];
 
 const CONTENT = {
@@ -12,47 +12,73 @@ const CONTENT = {
     <div class="tv-content active">
       <h1>LazyTool</h1>
       <div class="subtitle">Be less lazy.</div>
-      <p>A keyboard-driven productivity dashboard for your terminal. Manage todos, journal your thoughts, and track your time without leaving the command line.</p>
+      <p>A keyboard-driven terminal dashboard that combines <strong>task management</strong>, <strong>journaling</strong>, <strong>mood tracking</strong>, <strong>goal streaks</strong>, and <strong>time tracking</strong> — all without leaving the command line.</p>
+      <p style="font-size:0.75em; opacity:0.7;">100% offline · No accounts · Your data never leaves your machine</p>
       <div class="button-group">
-        <button class="btn-retro" onclick="switchTo(1)">What is it?</button>
-        <button class="btn-retro primary" onclick="switchTo(2)">Download</button>
+        <button class="btn-retro" onclick="switchTo(1)">Learn More</button>
+        <button class="btn-retro primary" onclick="switchTo(3)">Download v2.1.1</button>
       </div>
     </div>
   `,
   About: `
     <div class="tv-content active">
-      <h1>What is it?</h1>
-      <div class="subtitle">Terminal productivity.</div>
-      <p>Inspired by the efficiency of lazygit, LazyTool combines multiple tools into one terminal UI (TUI). It's built with Python and Textual for maximum speed and minimal distraction.</p>
-      <p>Manage your daily flow with integrated Todo, Journal, Mood, Goals, and Timeline panels.</p>
+      <h1>What is LazyTool?</h1>
+      <div class="subtitle">All-in-one terminal productivity.</div>
+      <p>Inspired by <strong>lazygit</strong>, LazyTool is a TUI (Terminal User Interface) built with Python and Textual. Every action is a single keystroke — no mouse needed.</p>
+      <p><strong>6 integrated panels:</strong> Todos, Journal, Moods, Goals, Timeline, and Stats — all with keyboard navigation (<em>j/k</em> to move, <em>1-6</em> to switch panels).</p>
+      <p><strong>Multi-Profile System:</strong> Press <em>Shift+P</em> to switch between Work, Personal, and School profiles — each with isolated data.</p>
+      <p><strong>Cross-platform:</strong> Runs on Windows, macOS, and Linux. Data stays local at <em>~/.lazytool/</em></p>
       <div class="button-group">
-        <button class="btn-retro" onclick="switchTo(0)">Back Home</button>
-        <button class="btn-retro primary" onclick="switchTo(2)">Download</button>
+        <button class="btn-retro" onclick="switchTo(2)">See All Features</button>
+        <button class="btn-retro primary" onclick="switchTo(3)">Download</button>
+      </div>
+    </div>
+  `,
+  Features: `
+    <div class="tv-content active" style="font-size:0.82em;">
+      <h1>Features</h1>
+      <div class="subtitle">Everything at your fingertips.</div>
+      <p><strong>📋 Todos</strong> — Three priority levels, smart auto-purge of old tasks, quick add/toggle/delete with single keys.</p>
+      <p><strong>📝 Journal</strong> — Multi-line editor with named entries, auto-timestamped, browse by date with h/l.</p>
+      <p><strong>📊 Moods</strong> — Six mood levels with notes, daily grouping, weekly average in Stats.</p>
+      <p><strong>🏁 Goals</strong> — Daily check-in streaks with a 30-day visual grid, smart history from creation date.</p>
+      <p><strong>⏳ Timeline</strong> — Start/stop activity tracking with cross-midnight support, colored timeline bar, event suggestions.</p>
+      <p><strong>📈 Stats</strong> — Configuraclassble window (1-90 days), multiple bar chart modes, export to .txt or .md.</p>
+      <p><strong>👤 Profiles</strong> — Shift+P to create, rename, or switch profiles. Each profile has its own data and exports.</p>
+      <div class="button-group">
+        <button class="btn-retro" onclick="switchTo(4)">Screenshots</button>
+        <button class="btn-retro primary" onclick="switchTo(3)">Download</button>
       </div>
     </div>
   `,
   Download: `
     <div class="tv-content active">
       <h1>Download</h1>
-      <div class="subtitle">v2.1.0 Now Available</div>
+      <div class="subtitle">v2.1.1 — Multi-Profile, Live Stats</div>
       <div class="download-boxes">
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.0/LazyTool-macOS.dmg" download class="download-box">
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
           <i class="fab fa-apple"></i>
           <span class="os-name">macOS</span>
           <small>.dmg installer</small>
         </a>
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.0/LazyTool-win.exe" download class="download-box">
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
           <i class="fab fa-windows"></i>
           <span class="os-name">Windows</span>
           <small>.exe setup</small>
         </a>
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
+          <i class="fab fa-linux"></i>
+          <span class="os-name">Linux</span>
+          <small>from source</small>
+        </a>
       </div>
-      <div class="button-group" style="margin-top: 20px;">
+      <p style="font-size:0.7em; opacity:0.6; margin-top:12px;">After installing on Windows, just type <strong>lazytool</strong> in any terminal.</p>
+      <div class="button-group" style="margin-top: 10px;">
         <button class="btn-retro" onclick="switchTo(0)">Back</button>
       </div>
     </div>
   `,
-  HowToUse: `
+  Screenshots: `
     <div class="tv-content active">
       <h1>Screenshots</h1>
       <div class="subtitle">App preview — swipe or use controls.</div>
@@ -301,7 +327,7 @@ function next() { switchTo(currentCh + 1); }
 function prev() { switchTo(currentCh - 1); }
 
 // ── INPUT ─────────────────────────────────────────────────────────
-document.getElementById('nextKnob').addEventListener('click', next);
+// nextKnob was removed from UI — channel switching via buttons + keyboard only
 
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); next(); }
@@ -321,6 +347,28 @@ function loop() {
 }
 
 loop();
+
+// ── BACKGROUND SCREENSHOT GALLERY ─────────────────────────────────
+(function initBgGallery() {
+  const container = document.getElementById('bgScreenshots');
+  if (!container || SCREENSHOTS.length === 0) return;
+
+  // We need 6 images for 3x2 grid — pad with duplication if needed
+  const images = [...SCREENSHOTS];
+  while (images.length < 6) images.push(images[images.length % SCREENSHOTS.length]);
+
+  images.slice(0, 6).forEach(src => {
+    const img = document.createElement('img');
+    img.className = 'bg-img';
+    img.src = src;
+    img.draggable = false;
+    img.oncontextmenu = () => false;
+    container.appendChild(img);
+  });
+
+  // Block right-click on the container too
+  container.oncontextmenu = (e) => { e.preventDefault(); return false; };
+})();
 
 // ── AUDIO ENGINE ──────────────────────────────────────────────────
 let audioCtx = null;
@@ -360,7 +408,7 @@ function buildAudio() {
   // C2, G2, E3, B3, G4, D5  → lush, open, non-dissonant
   const notes = [65.41, 98, 164.81, 246.94, 392, 587.33];
   const detunes = [0, 3, -4, 5, -2, 6];
-  const gains   = [0.22, 0.18, 0.16, 0.12, 0.09, 0.06];
+  const gains = [0.22, 0.18, 0.16, 0.12, 0.09, 0.06];
 
   notes.forEach((freq, i) => {
     // Main voice
@@ -549,7 +597,14 @@ function updateVolUI() {
 
   volPct.textContent = Math.round(volume * 100);
 
-  if (masterGain) masterGain.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.05);
+  if (masterGain) {
+    // when the knob is at zero we treat it as a mute and snap gain to 0 immediately
+    if (volume <= 0) {
+      masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    } else {
+      masterGain.gain.setTargetAtTime(volume, audioCtx.currentTime, 0.05);
+    }
+  }
 }
 
 function showVolFeedback() {
