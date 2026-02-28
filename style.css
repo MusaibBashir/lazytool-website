@@ -825,6 +825,10 @@ body::before {
 }
 
 @media (max-width: 640px) {
+  .bg-screenshots {
+    display: none;
+  }
+
   .tv-screen {
     width: 320px;
     height: 240px;
