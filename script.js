@@ -56,12 +56,20 @@ const CONTENT = {
       <h1>Download</h1>
       <div class="subtitle">v2.1.1 — Multi-Profile, Live Stats</div>
       <div class="download-boxes">
+<<<<<<< HEAD
         <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
+=======
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.1/LazyTool-macOS.dmg" download class="download-box">
+>>>>>>> c404753fc687ce49d18bbc3cf2c8b6e69fd50eaa
           <i class="fab fa-apple"></i>
           <span class="os-name">macOS</span>
           <small>.dmg installer</small>
         </a>
+<<<<<<< HEAD
         <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
+=======
+        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.1/LazyTool-win.exe" download class="download-box">
+>>>>>>> c404753fc687ce49d18bbc3cf2c8b6e69fd50eaa
           <i class="fab fa-windows"></i>
           <span class="os-name">Windows</span>
           <small>.exe setup</small>
