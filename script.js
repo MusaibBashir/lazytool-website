@@ -71,10 +71,10 @@ const CONTENT = {
           <span class="os-name">Windows</span>
           <small>.exe setup</small>
         </a>
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
+        <a id="linuxDownload" href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.1/lazytool-linux" class="download-box" onclick="handleLinuxDownload(event)">
           <i class="fab fa-linux"></i>
           <span class="os-name">Linux</span>
-          <small>from source</small>
+          <small>binary</small>
         </a>
       </div>
       <p style="font-size:0.7em; opacity:0.6; margin-top:12px;">After installing on Windows, just type <strong>lazytool</strong> in any terminal.</p>
@@ -106,8 +106,34 @@ const CONTENT = {
         <li>Then click <strong>Run anyway</strong>.</li>
       </ol>
       <img src="images/defender2.png" alt="Example Defender warning" style="max-width:100%;margin-top:6px;">
-      <p style="margin-top:10px;">This happens because it doesn't have a liscence(Can't pay 150 USD for a hobby app).</p>
+      <p style="margin-top:10px;">This happens because it doesn't have a license(Can't pay 150 USD for a hobby app).</p>
       <div class="button-group" style="margin-top:15px;">
+        <button class="btn-retro" onclick="switchTo(3)">Back to Download</button>
+      </div>
+    </div>
+  `,
+  LinuxInstructions: `
+    <div class="tv-content active" style="font-size:0.85em;">
+      <h1>Linux Installation</h1>
+      <div class="subtitle" style="margin-bottom:15px;">Just a few commands</div>
+      <ol style="margin-left:20px;font-size:0.95em;padding-right:10px;">
+        <li style="margin-bottom:12px;">The download of binary would start automatically</li>
+        <li style="margin-bottom:12px;">Open your terminal in the directory where you downloaded it.</li>
+        <li style="margin-bottom:12px;">Make the file executable:<br>
+          <div style="background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px 12px;border-radius:6px;margin-top:6px;font-family:monospace;color:#e8e2d9;">
+            <span style="color:#c4893a;">chmod</span> +x lazytool-linux
+          </div>
+        </li>
+        <li style="margin-bottom:12px;">Move it to a directory in your system's <span style="background:rgba(255,255,255,0.1);padding:2px 4px;border-radius:4px;font-size:0.9em;">PATH</span> so you can run it from anywhere:<br>
+          <div style="background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px 12px;border-radius:6px;margin-top:6px;font-family:monospace;color:#e8e2d9;">
+            <span style="color:#c4893a;">sudo</span> mv lazytool-linux /usr/local/bin/lazytool
+          </div>
+        </li>
+        <li style="margin-bottom:12px;">You can now launch the application by typing:<br>
+          <div style="background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px 12px;border-radius:6px;margin-top:6px;font-family:monospace;color:#e8e2d9;">lazytool</div>
+        </li>
+      </ol>
+      <div class="button-group" style="margin-top:10px;">
         <button class="btn-retro" onclick="switchTo(3)">Back to Download</button>
       </div>
     </div>
@@ -304,7 +330,7 @@ function drawScreen(ch, staticAlpha) {
   }
 }
 
-// ── SWITCH CHANNEL ────────────────────────────────────────────────
+// ── SWITCH CHANNEL
 function switchTo(idx) {
   if (switching) return;
   switching = true;
@@ -361,10 +387,6 @@ loop();
   const images = [...SCREENSHOTS];
   const imgElements = [];
 
-  // We need 6 images for 3x2 grid if ratio isn't suitable — pad with duplication if needed
-  const gridImages = [...SCREENSHOTS];
-  while (gridImages.length < 6) gridImages.push(gridImages[gridImages.length % SCREENSHOTS.length]);
-
   images.forEach((src, index) => {
     const img = document.createElement('img');
     img.className = 'bg-img';
@@ -380,67 +402,11 @@ loop();
   container.oncontextmenu = (e) => { e.preventDefault(); return false; };
 
   let currentBgIndex = 0;
-  let intervalId = null;
-
-  function setBackgroundLayout() {
-    const windowRatio = window.innerWidth / window.innerHeight;
-    // Check if the aspect ratio is roughly wide enough for a single image, e.g. > 1.2
-    if (windowRatio > 1.2) {
-      container.classList.remove('grid-layout');
-      // Ensure all images are available for cycling
-      imgElements.forEach(img => {
-        img.style.position = 'absolute';
-      });
-      if (!intervalId) {
-        intervalId = setInterval(() => {
-          imgElements[currentBgIndex].classList.remove('active');
-          currentBgIndex = (currentBgIndex + 1) % imgElements.length;
-          imgElements[currentBgIndex].classList.add('active');
-        }, 4000); // Change image every 3 seconds
-      }
-    } else {
-      // Fallback to grid of multiple images
-      container.classList.add('grid-layout');
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-
-      // Update DOM to show 6 images for grid
-      container.innerHTML = '';
-      gridImages.slice(0, 6).forEach(src => {
-        const img = document.createElement('img');
-        img.className = 'bg-img grid-item';
-        img.src = src;
-        img.draggable = false;
-        img.oncontextmenu = () => false;
-        container.appendChild(img);
-      });
-    }
-  }
-
-  // Initial setup and listener on resize
-  setBackgroundLayout();
-  window.addEventListener('resize', () => {
-    // Re-initialize for simplicity if returning to single view
-    if (container.classList.contains('grid-layout') && (window.innerWidth / window.innerHeight) > 1.2) {
-      container.innerHTML = '';
-      imgElements.length = 0;
-
-      images.forEach((src, index) => {
-        const img = document.createElement('img');
-        img.className = 'bg-img';
-        img.src = src;
-        img.draggable = false;
-        img.oncontextmenu = () => false;
-        container.appendChild(img);
-        imgElements.push(img);
-      });
-      currentBgIndex = 0;
-      imgElements[currentBgIndex].classList.add('active');
-    }
-    setBackgroundLayout();
-  });
+  setInterval(() => {
+    imgElements[currentBgIndex].classList.remove('active');
+    currentBgIndex = (currentBgIndex + 1) % imgElements.length;
+    imgElements[currentBgIndex].classList.add('active');
+  }, 4000);
 
 })();
 
@@ -671,6 +637,22 @@ function handleWinDownload(e) {
   // show instructions in the tv overlay
   if (CONTENT.WinInstructions) {
     overlay.innerHTML = CONTENT.WinInstructions;
+  }
+}
+
+function handleLinuxDownload(e) {
+  e.preventDefault();
+  const url = e.currentTarget.href;
+  // trigger browser download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // show instructions in the tv overlay
+  if (CONTENT.LinuxInstructions) {
+    overlay.innerHTML = CONTENT.LinuxInstructions;
   }
 }
 
