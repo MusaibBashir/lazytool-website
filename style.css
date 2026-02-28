@@ -824,11 +824,13 @@ body::before {
   }
 }
 
-@media (max-width: 640px) {
+@media (orientation: portrait) {
   .bg-screenshots {
     display: none;
   }
+}
 
+@media (max-width: 640px) {
   .tv-screen {
     width: 320px;
     height: 240px;
