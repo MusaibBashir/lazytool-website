@@ -3,20 +3,26 @@ const CHANNELS = [
   { ch: 2, name: 'About', hex: '#2e3d4f', r: 46, g: 61, b: 79, desc: 'What is LazyTool?' },
   { ch: 3, name: 'Features', hex: '#3d2e4f', r: 61, g: 46, b: 79, desc: 'All features' },
   { ch: 4, name: 'Download', hex: '#4a5e45', r: 74, g: 94, b: 69, desc: 'Get the tool' },
-  { ch: 5, name: 'Screenshots', hex: '#9c7c5e', r: 156, g: 124, b: 94, desc: 'Screenshots' },
-  { ch: 6, name: 'AboutMe', hex: '#c4893a', r: 196, g: 137, b: 58, desc: 'Meet the dev' },
+  { ch: 5, name: 'AboutMe', hex: '#c4893a', r: 196, g: 137, b: 58, desc: 'Meet the dev' },
 ];
 
 const CONTENT = {
   Home: `
     <div class="tv-content active">
-      <h1>LazyTool</h1>
-      <div class="subtitle">Be less lazy.</div>
-      <p>A keyboard-driven terminal dashboard that combines <strong>task management</strong>, <strong>journaling</strong>, <strong>mood tracking</strong>, <strong>goal streaks</strong>, and <strong>time tracking</strong> — all without leaving the command line.</p>
-      <p style="font-size:0.75em; opacity:0.7;">100% offline · No accounts · Your data never leaves your machine</p>
-      <div class="button-group">
-        <button class="btn-retro" onclick="switchTo(1)">Learn More</button>
-        <button class="btn-retro primary" onclick="switchTo(3)">Download v2.1.1</button>
+      <div class="home-layout">
+        <div class="home-text">
+          <h1>LazyTool</h1>
+          <div class="subtitle">Be less lazy.</div>
+          <p>A keyboard-driven terminal dashboard that combines <strong>task management</strong>, <strong>journaling</strong>, <strong>mood tracking</strong>, <strong>goal streaks</strong>, and <strong>time tracking</strong> — all without leaving the command line.</p>
+          <p style="font-size:0.75em; opacity:0.7;">100% offline · No accounts · Your data never leaves your machine</p>
+        </div>
+        <div class="home-logo">
+          <img src="transparent-logo.png" alt="LazyTool Logo" class="logo-img" />
+          <div class="button-group" style="flex-direction:column; margin-top:12px;">
+            <button class="btn-retro" onclick="switchTo(1)">Learn More</button>
+            <button class="btn-retro primary" onclick="switchTo(3)">Download v2.1.1</button>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -38,15 +44,14 @@ const CONTENT = {
     <div class="tv-content active" style="font-size:0.82em;">
       <h1>Features</h1>
       <div class="subtitle">Everything at your fingertips.</div>
-      <p><strong>📋 Todos</strong> — Three priority levels, smart auto-purge of old tasks, quick add/toggle/delete with single keys.</p>
-      <p><strong>📝 Journal</strong> — Multi-line editor with named entries, auto-timestamped, browse by date with h/l.</p>
-      <p><strong>📊 Moods</strong> — Six mood levels with notes, daily grouping, weekly average in Stats.</p>
-      <p><strong>🏁 Goals</strong> — Daily check-in streaks with a 30-day visual grid, smart history from creation date.</p>
-      <p><strong>⏳ Timeline</strong> — Start/stop activity tracking with cross-midnight support, colored timeline bar, event suggestions.</p>
-      <p><strong>📈 Stats</strong> — Configuraclassble window (1-90 days), multiple bar chart modes, export to .txt or .md.</p>
-      <p><strong>👤 Profiles</strong> — Shift+P to create, rename, or switch profiles. Each profile has its own data and exports.</p>
+      <p><strong>Todos</strong> — Three priority levels, smart auto-purge of old tasks, quick add/toggle/delete with single keys.</p>
+      <p><strong>Journal</strong> — Multi-line editor with named entries, auto-timestamped, browse by date with h/l.</p>
+      <p><strong>Moods</strong> — Six mood levels with notes, daily grouping, weekly average in Stats.</p>
+      <p><strong>Goals</strong> — Daily check-in streaks with a 30-day visual grid, smart history from creation date.</p>
+      <p><strong>Timeline</strong> — Start/stop activity tracking with cross-midnight support, colored timeline bar, event suggestions.</p>
+      <p><strong>Stats</strong> — Configuraclassble window (1-90 days), multiple bar chart modes, export to .txt or .md.</p>
+      <p><strong>Profiles</strong> — Shift+P to create, rename, or switch profiles. Each profile has its own data and exports.</p>
       <div class="button-group">
-        <button class="btn-retro" onclick="switchTo(4)">Screenshots</button>
         <button class="btn-retro primary" onclick="switchTo(3)">Download</button>
       </div>
     </div>
@@ -56,20 +61,12 @@ const CONTENT = {
       <h1>Download</h1>
       <div class="subtitle">v2.1.1 — Multi-Profile, Live Stats</div>
       <div class="download-boxes">
-<<<<<<< HEAD
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
-=======
         <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.1/LazyTool-macOS.dmg" download class="download-box">
->>>>>>> c404753fc687ce49d18bbc3cf2c8b6e69fd50eaa
           <i class="fab fa-apple"></i>
           <span class="os-name">macOS</span>
           <small>.dmg installer</small>
         </a>
-<<<<<<< HEAD
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/latest" class="download-box">
-=======
-        <a href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.1/LazyTool-win.exe" download class="download-box">
->>>>>>> c404753fc687ce49d18bbc3cf2c8b6e69fd50eaa
+        <a id="winDownload" href="https://github.com/MusaibBashir/Lazytool/releases/download/v2.1.1/LazyTool-win.exe" download class="download-box" onclick="handleWinDownload(event)">
           <i class="fab fa-windows"></i>
           <span class="os-name">Windows</span>
           <small>.exe setup</small>
@@ -86,43 +83,43 @@ const CONTENT = {
       </div>
     </div>
   `,
-  Screenshots: `
-    <div class="tv-content active">
-      <h1>Screenshots</h1>
-      <div class="subtitle">App preview — swipe or use controls.</div>
-      <div class="slideshow">
-        <div class="slideshow-stage">
-          <button class="slide-btn prev" id="prevSlide" aria-label="Previous">◀</button>
-          <img id="slideshowImg" src="" alt="screenshot" />
-          <button class="slide-btn next" id="nextSlide" aria-label="Next">▶</button>
-        </div>
-        <div class="dots" id="slideDots" aria-hidden="false"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn-retro" onclick="switchTo(0)">Back</button>
-      </div>
-    </div>
-  `,
+
   AboutMe: `
     <div class="tv-content active">
       <h1>About Me</h1>
       <div class="subtitle">Musaib Bin Bashir</div>
-      <p>Hey! I'm Musaib, the developer behind LazyTool. I love building tools that live in the terminal because they're fast, distraction-free, and look cool.</p>
-      <p>LazyTool was born out of my own need to stop "tab-switching" between a dozen productivity apps. Now it's my daily driver.</p>
+      <p>Hey! I'm Musaib, the developer behind LazyTool. I love building tools that help in daily life. Iam excited by tools that live in the terminal because they're fast, distraction-free, and look cool.</p>
+      <p>LazyTool was born out of my own need to stop procrastination. I couldn't find any tool for laptop that had all the features I wanted. So I decided to build one myself. Now it's my daily driver.</p>
       <div class="button-group">
         <button class="btn-retro" onclick="switchTo(0)">Back Home</button>
+      </div>
+    </div>
+  `,
+  WinInstructions: `
+    <div class="tv-content active">
+      <h1>Windows Installer Safety</h1>
+      <div class="subtitle">It's safe to proceed</div>
+      <p>Windows Defender may show a warning because the app is new. But I assure you it is completely safe, and doesn't even need internet to work</p>
+      <ol style="margin-left:20px;font-size:0.9em;">
+        <li>When the "Windows protected your PC" dialog appears, click <strong>More info</strong>.</li>
+        <img src="images/defender1.png" alt="Example Defender warning" style="max-width:100%;margin-top:6px;">
+        <li>Then click <strong>Run anyway</strong>.</li>
+      </ol>
+      <img src="images/defender2.png" alt="Example Defender warning" style="max-width:100%;margin-top:6px;">
+      <p style="margin-top:10px;">This happens because it doesn't have a liscence(Can't pay 150 USD for a hobby app).</p>
+      <div class="button-group" style="margin-top:15px;">
+        <button class="btn-retro" onclick="switchTo(3)">Back to Download</button>
       </div>
     </div>
   `
 };
 
-// Slideshow images (Cloudinary links). Replace with your actual URLs.
+// Slideshow images (Local images)
 const SCREENSHOTS = [
-  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-21_212646_arpf2k.png',
-  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-22_202526_feeqkc.png',
-  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772179/Screenshot_2026-02-22_202547_avlxqg.png',
-  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-21_212646_arpf2k.png',
-  'https://res.cloudinary.com/de29hvv4d/image/upload/v1771772178/Screenshot_2026-02-22_202531_sffhh9.png'
+  'images/Screenshot (66).png',
+  'images/bg2.png',
+  'images/bg3.png',
+  'images/Screenshot (67).png'
 ];
 
 // Slideshow state
@@ -164,7 +161,7 @@ function startSlideshow() {
   if (nextBtn) nextBtn.addEventListener('click', nextSlide);
   if (prevBtn) prevBtn.addEventListener('click', prevSlide);
   renderSlide();
-  slideTimer = setInterval(nextSlide, 3000);
+  slideTimer = setInterval(nextSlide, 4000);
 }
 
 function stopSlideshow() {
@@ -361,21 +358,90 @@ loop();
   const container = document.getElementById('bgScreenshots');
   if (!container || SCREENSHOTS.length === 0) return;
 
-  // We need 6 images for 3x2 grid — pad with duplication if needed
   const images = [...SCREENSHOTS];
-  while (images.length < 6) images.push(images[images.length % SCREENSHOTS.length]);
+  const imgElements = [];
 
-  images.slice(0, 6).forEach(src => {
+  // We need 6 images for 3x2 grid if ratio isn't suitable — pad with duplication if needed
+  const gridImages = [...SCREENSHOTS];
+  while (gridImages.length < 6) gridImages.push(gridImages[gridImages.length % SCREENSHOTS.length]);
+
+  images.forEach((src, index) => {
     const img = document.createElement('img');
     img.className = 'bg-img';
+    if (index === 0) img.classList.add('active');
     img.src = src;
     img.draggable = false;
     img.oncontextmenu = () => false;
     container.appendChild(img);
+    imgElements.push(img);
   });
 
   // Block right-click on the container too
   container.oncontextmenu = (e) => { e.preventDefault(); return false; };
+
+  let currentBgIndex = 0;
+  let intervalId = null;
+
+  function setBackgroundLayout() {
+    const windowRatio = window.innerWidth / window.innerHeight;
+    // Check if the aspect ratio is roughly wide enough for a single image, e.g. > 1.2
+    if (windowRatio > 1.2) {
+      container.classList.remove('grid-layout');
+      // Ensure all images are available for cycling
+      imgElements.forEach(img => {
+        img.style.position = 'absolute';
+      });
+      if (!intervalId) {
+        intervalId = setInterval(() => {
+          imgElements[currentBgIndex].classList.remove('active');
+          currentBgIndex = (currentBgIndex + 1) % imgElements.length;
+          imgElements[currentBgIndex].classList.add('active');
+        }, 4000); // Change image every 3 seconds
+      }
+    } else {
+      // Fallback to grid of multiple images
+      container.classList.add('grid-layout');
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+
+      // Update DOM to show 6 images for grid
+      container.innerHTML = '';
+      gridImages.slice(0, 6).forEach(src => {
+        const img = document.createElement('img');
+        img.className = 'bg-img grid-item';
+        img.src = src;
+        img.draggable = false;
+        img.oncontextmenu = () => false;
+        container.appendChild(img);
+      });
+    }
+  }
+
+  // Initial setup and listener on resize
+  setBackgroundLayout();
+  window.addEventListener('resize', () => {
+    // Re-initialize for simplicity if returning to single view
+    if (container.classList.contains('grid-layout') && (window.innerWidth / window.innerHeight) > 1.2) {
+      container.innerHTML = '';
+      imgElements.length = 0;
+
+      images.forEach((src, index) => {
+        const img = document.createElement('img');
+        img.className = 'bg-img';
+        img.src = src;
+        img.draggable = false;
+        img.oncontextmenu = () => false;
+        container.appendChild(img);
+        imgElements.push(img);
+      });
+      currentBgIndex = 0;
+      imgElements[currentBgIndex].classList.add('active');
+    }
+    setBackgroundLayout();
+  });
+
 })();
 
 // ── AUDIO ENGINE ──────────────────────────────────────────────────
@@ -590,6 +656,22 @@ function describeArc(cx, cy, r, startDeg, endDeg) {
   const [ex, ey] = polar(endDeg);
   const large = endDeg - startDeg > 180 ? 1 : 0;
   return `M ${sx} ${sy} A ${r} ${r} 0 ${large} 1 ${ex} ${ey}`;
+}
+
+function handleWinDownload(e) {
+  e.preventDefault();
+  const url = e.currentTarget.href;
+  // trigger browser download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // show instructions in the tv overlay
+  if (CONTENT.WinInstructions) {
+    overlay.innerHTML = CONTENT.WinInstructions;
+  }
 }
 
 function updateVolUI() {
